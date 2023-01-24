@@ -11,8 +11,8 @@ class WPDashboard extends \acf_location {
 
 		// vars
 		$this->name = 'wp_dashboard';
-		$this->label = __( 'User Dashboard', 'acf-wp-objects' );
-		$this->category = __( 'WordPress', 'acf-wp-objects' );
+		$this->label = __( 'User Dashboard', 'acf-wizard' );
+		$this->category = __( 'WordPress', 'acf-wizard' );
 
 	}
 
@@ -41,7 +41,7 @@ class WPDashboard extends \acf_location {
 
 		// global
 		$choices = [
-			'welcome_panel' => __( 'Welcome Panel', 'acf-wp-objects' ),
+			'welcome_panel' => __( 'Welcome Panel', 'acf-wizard' ),
 		];
 
 		return $choices;
