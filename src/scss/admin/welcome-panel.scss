@@ -1,10 +1,6 @@
 @import "mixins/index";
 @import "variables/index";
 
-.welcome-panel-close,
-label[for="wp_welcome_panel-hide"] {
-	display:none;
-}
 .welcome-panel {
 	.postbox {
 		margin-bottom: 0;

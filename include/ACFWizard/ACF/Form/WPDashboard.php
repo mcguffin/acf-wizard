@@ -42,15 +42,20 @@ class WPDashboard extends Core\Singleton {
 		// assets
 		acf_enqueue_scripts();
 
-		Asset\Asset::get('css/admin/welcome-panel.css')->enqueue();
+		$css = Asset\Asset::get('css/admin/welcome-panel.css')->enqueue();
 
-		// disallow hide
-		add_filter('get_user_metadata', function( $meta, $user_id, $meta_key ) {
-			if ( 'show_welcome_panel' === $meta_key ) {
-				return true;
-			}
-			return $meta;
-		}, 10, 3 );
+		if ( ! apply_filters( 'acf_wizard_welcome_dismissable', false ) ) {
+
+			wp_add_inline_style($css->handle, '.welcome-panel-close, label[for="wp_welcome_panel-hide"] { display:none; }' );
+
+			// disallow hide
+			add_filter('get_user_metadata', function( $meta, $user_id, $meta_key ) {
+				if ( 'show_welcome_panel' === $meta_key ) {
+					return true;
+				}
+				return $meta;
+			}, 10, 3 );
+		}
 
 		// process form
 		add_action( 'load-index.php', [ $this, 'process_form' ] );
