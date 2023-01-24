@@ -1,0 +1,117 @@
+{
+  "name": "acf-wizard",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "author": "mcguffin",
+  "license": "GPL-3.0-or-later",
+  "engines": {
+    "node": "12.4.0",
+    "npm": "^6.9.0"
+  },
+  "scripts": {
+    "audit": "./vendor/squizlabs/php_codesniffer/bin/phpcs . --report=code --standard=./phpcs-security.ruleset.xml -n -s > ./phpcs-report.txt || exit 0",
+    "audit-fix": "./vendor/squizlabs/php_codesniffer/bin/phpcbf . --standard=./phpcs.ruleset.xml || exit 0",
+    "postinstall": "composer install",
+    "dashicons": "node ./src/run/dashicons.js",
+    "init": "mkdir -p json/acf && mkdir -p json/post-type && mkdir -p json/taxonomy && mkdir -p src/php",
+    "dev": "gulp dev",
+    "i18n": "node src/run/json-i18n.js acf-wizard",
+    "setversion": "PVER=$(node -e \"console.log(require('./package.json').version);\") && echo \"<?php return '$PVER';\" > ./include/version.php",
+    "rollback": "git reset --hard HEAD~ && git push origin +master"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "> 0.125%",
+    "IE 10"
+  ],
+  "browserify-shim": {
+    "jquery": "global:jQuery",
+    "backbone": "global:Backbone",
+    "classnames": "global:classnames",
+    "lodash": "global:lodash",
+    "@wordpress/blob": "global:wp.blob",
+    "@wordpress/blocks": "global:wp.blocks",
+    "@wordpress/block-editor": "global:wp.blockEditor",
+    "@wordpress/block-library": "global:wp.blockLibrary",
+    "@wordpress/components": "global:wp.components",
+    "@wordpress/compose": "global:wp.compose",
+    "@wordpress/data": "global:wp.data",
+    "@wordpress/dom": "global:wp.dom",
+    "@wordpress/editor": "global:wp.editor",
+    "@wordpress/element": "global:wp.element",
+    "@wordpress/format-library": "global:wp.formatLibrary",
+    "@wordpress/i18n": "global:wp.i18n",
+    "@wordpress/keycodes": "global:wp.keycodes",
+    "@wordpress/rich-text": "global:wp.richText"
+  },
+  "devDependencies": {
+    "@babel/core": "*",
+    "@babel/plugin-proposal-class-properties": "*",
+    "@babel/plugin-proposal-object-rest-spread": "*",
+    "@babel/plugin-transform-react-jsx": "*",
+    "@babel/preset-env": "*",
+    "babelify": "*",
+    "browserify": "*",
+    "browserify-shim": "*",
+    "gulp": "*",
+    "event-stream": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-sass": "*",
+    "gulp-sourcemaps": "*",
+    "uglifyify": "*",
+    "vinyl-buffer": "*",
+    "vinyl-source-stream": "*",
+    "sass": "*",
+    "tinyify": "*"
+  },
+  "dependencies": {
+    "@wordpress/blob": "*",
+    "@wordpress/block-editor": "*",
+    "@wordpress/block-library": "*",
+    "@wordpress/blocks": "*",
+    "@wordpress/components": "*",
+    "@wordpress/compose": "*",
+    "@wordpress/data": "*",
+    "@wordpress/dom": "*",
+    "@wordpress/editor": "*",
+    "@wordpress/element": "*",
+    "@wordpress/format-library": "*",
+    "@wordpress/i18n": "*",
+    "@wordpress/keycodes": "*",
+    "@wordpress/media-utils": "*",
+    "@wordpress/rich-text": "*",
+    "jquery": "^1.12.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcguffin/acf-wizard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mcguffin/acf-wizard/issues"
+  },
+  "wpSkeleton": {
+    "components": {
+      "core": {
+        "components": [],
+        "flags": [
+          "css",
+          "js"
+        ]
+      },
+      "git": {
+        "user": "mcguffin",
+        "remote": "git@github.com:mcguffin/acf-wizard.git"
+      }
+    },
+    "type": "plugin",
+    "name": "ACF Wizard",
+    "slug": "acf-wizard",
+    "prefix": "acf_wizard",
+    "textdomain": "acf-wizard",
+    "namespace": "ACFWizard",
+    "author": "mcguffin",
+    "author_uri": "https://github.com/mcguffin",
+    "year": 2023
+  }
+}
