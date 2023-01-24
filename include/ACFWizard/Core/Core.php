@@ -7,10 +7,8 @@
 
 namespace ACFWizard\Core;
 
-if ( ! defined('ABSPATH') ) {
-	die('FU!');
-}
 use ACFWizard\Asset;
+use ACFWizard\ACF\Form;
 
 class Core extends Plugin implements CoreInterface {
 
@@ -19,41 +17,31 @@ class Core extends Plugin implements CoreInterface {
 	 */
 	protected function __construct() {
 
-		add_action( 'init' , array( $this , 'init' ) );
+		add_action( 'acf/include_field_types', [ $this, 'register_field_types' ] );
+		add_action( 'acf/include_location_rules', [ $this, 'register_location_rules' ] );
 
-		add_action( 'wp_enqueue_scripts' , array( $this , 'enqueue_assets' ) );
+		Form\WPDashboard::instance();
 
 		$args = func_get_args();
 		parent::__construct( ...$args );
 	}
 
 	/**
-	 *	Load frontend styles and scripts
-	 *
-	 *	@action wp_enqueue_scripts
-	 */
-	public function enqueue_assets() {
-		Asset\Asset::get( 'css/main.css' )->enqueue();
-		Asset\Asset::get( 'js/main.js' )
-			->deps( ['jquery'] )
-			->localize( array(
-				/* Script localization */
-			) )
-			->enqueue();
-	}
-
-
-
-
-
-
-	/**
 	 *	Init hook.
 	 *
-	 *  @action init
+	 *  @action acf/init
 	 */
-	public function init() {
+	public function register_field_types() {
+
+		acf_register_field_type( 'ACFWizard\ACF\Field\WizardProceed' );
+		acf_register_field_type( 'ACFWizard\ACF\Field\WizardStep' );
+
 	}
 
+	public function register_location_rules() {
+
+		acf_register_location_rule( 'ACFWizard\ACF\Location\WPDashboard' );
+
+	}
 
 }

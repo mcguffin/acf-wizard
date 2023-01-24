@@ -1,0 +1,19 @@
+@import "mixins/index";
+@import "variables/index";
+
+.welcome-panel-close,
+label[for="wp_welcome_panel-hide"] {
+	display:none;
+}
+.welcome-panel {
+	.postbox {
+		margin-bottom: 0;
+	}
+	.acf-form-submit {
+		display: flex;
+		justify-content:flex-end;
+		padding: 10px;
+		border-top: 1px solid wp-color(gray-5);
+		background: wp-color(gray-0);
+	}
+}

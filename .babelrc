@@ -4,14 +4,7 @@
   ],
   "plugins": [
     "@babel/plugin-proposal-object-rest-spread",
-	"@babel/plugin-proposal-class-properties",
-    [
-      "@babel/transform-react-jsx",
-      {
-        "pragma": "wp.element.createElement",
-		"pragmaFrag": "React.Fragment"
-      }
-    ]
+	"@babel/plugin-proposal-class-properties"
   ],
   "env": {
     "default": {

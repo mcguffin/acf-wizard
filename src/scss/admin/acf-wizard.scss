@@ -1,0 +1,53 @@
+@import "variables/index";
+
+.acf-field-wizard-step,
+.acf-field-wizard-step.active ~ .acf-field-wizard-step:not(.active) ~ *,
+.acf-field-wizard-step:not(.active) ~ :not(.active ~ *) {
+	display: none;
+}
+
+.acf-wizard-stepper {
+	display: flex;
+	justify-content: center;
+	padding: 10px;
+	.acf-wizard-nav-item {
+		appearance: none;
+		border: none;
+		background: none;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		&[disabled] {
+			color: wp-color(gray-20);
+			cursor: not-allowed;
+		}
+		&.active {
+			color:wp-color(blue-50);
+		}
+		&.-numbered {
+			counter-increment: idx;
+			&::before {
+				content: counter(idx);
+				display: inline-flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: 700;
+				padding:5px;
+				margin-right:7px;
+				width:18px;
+				height:18px;
+				border-radius:50%;
+				border:2px solid currentColor;
+				color:currentColor;
+			}
+		}
+		&:not(:last-child)::after {
+			content:'';
+			display: block;
+			width: 30px;
+			height:0;
+			margin:0 15px;
+			border-top:2px dotted currentColor;
+		}
+	}
+}

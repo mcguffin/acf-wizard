@@ -13,29 +13,6 @@ const child_process	= require( 'child_process' );
 
 const package = require( './package.json' );
 
-let bundlemap = {};
-
-const onFile = (target) => function( file, id, parent ) {
-
-	let f = file.replace( __dirname + '/','')
-	// ignore external deps!
-	if ( f.indexOf('node_modules/') === 0 ) {
-		return;
-	}
-	if ( ! bundlemap[ f ] ) {
-		bundlemap[ f ] = [];
-	}
-	bundlemap[ f ].push('js/'+target)
-}
-const onPackage = function(bundle) {
-	// extract from
-	Object.keys(bundlemap).forEach(src => {
-		//  distinct
-		bundlemap[src] = bundlemap[src].filter( ( val, idx, self ) => self.indexOf( val ) === idx )
-	})
-	fs.writeFileSync( './src/js/bundlemap.json',JSON.stringify( bundlemap, null, 2 ), {encoding:'utf-8'});
-}
-
 const config = {
 	sass : {
 		outputStyle: 'compressed',
@@ -63,101 +40,10 @@ const config = {
 }
 
 
-gulp.task('i18n:fix-pot', cb => {
-	try {
-		bundlemap = require( './src/js/bundlemap.json')
-		glob.sync('./languages/*.po*')
-			.map( entry => {
-				let contents = fs.readFileSync( entry, { encoding: 'utf-8' } );
-				Object.keys(bundlemap).forEach( src => {
-					// replace source with destinations
-					let replace = '';
-					let search = RegExp( '#:\\s'+ src.replace('.','\\.') + ':(\\d+)\n', 'g' );
-					bundlemap[src].forEach( dest => {
-						replace += '#: ' + dest + "\n";
-					} );
-					contents = contents.replace( search, replace ).replace( replace+replace,replace);
-				} );
-				// remove leftovers
-
-		//		contents = contents.replace( /#:\ssrc\/js(.+)\.js:(\d+)\n/g, '' );
-				fs.writeFileSync( entry, contents, { encoding: 'utf-8' } );
-			} )
-	} catch(err) {};
-	cb();
-});
 gulp.task('i18n:make-pot',cb => {
 	child_process.execSync(`wp i18n make-pot . languages/${package.name}.pot --domain=${package.name} --include=src/js/*.js,*.php --exclude=*.*`);
 	cb();
-})
-gulp.task('i18n:make-json',cb => {
-	// rm -f languages/*.json
-	glob.sync('./languages/*.json').map( fs.unlinkSync );
-	glob.sync('./languages/*.po').length && child_process.execSync( "wp i18n make-json languages/*.po --no-purge" );
-	cb();
 });
-
-/**
- *	wp i18n make-json lack textdomain prefix in themes
- *	@see https://github.com/wp-cli/i18n-command/issues/197
- */
-gulp.task('i18n:theme-fix-json',cb => {
-	// rm -f languages/*.json
-	glob.sync('./languages/*.json')
-		.map( entry => {
-
-			let basename = path.basename(entry);
-
-			if ( basename.indexOf( package.wpSkeleton.textdomain ) === -1 ) {
-				fs.renameSync( entry, path.join(
-					path.dirname(entry),
-					`${package.wpSkeleton.textdomain}-${basename}`
-				) );
-			}
-		})
-	cb();
-});
-
-
-gulp.task('i18n:strings-from-json', cb => {
-	// rm -f languages/*.json
-	const xt = require('./src/run/lib/json-extract.js');
-
-
-	let strings = [];
-
-	const common_mapping = {
-		title:xt.map_string,
-		description:xt.map_string,
-		label:xt.map_string,
-		labels:xt.map_values,
-	}
-
-	const acf_mapping = {
-		title:xt.map_string,
-		description:xt.map_string,
-		label:xt.map_string,
-		button_label:xt.map_string,
-		instructions:xt.map_string,
-		prepend:xt.map_string,
-		append:xt.map_string,
-		message:xt.map_string,
-		choices:xt.map_values
-	}
-
-
-	// ptype, taxo
-	strings = xt.parse_files( glob.sync('./json/post-type/*.json'), common_mapping, strings);
-	strings = xt.parse_files( glob.sync('./json/taxonomy/*.json'), common_mapping, strings);
-
-	// acf
-	strings = xt.parse_files( glob.sync('./json/acf/*.json'), acf_mapping, strings);
-
-	xt.generate_php( './src/php/json-strings.php', strings, package.name );
-
-	cb();
-});
-
 
 function js_task(debug) {
 	return cb => {
@@ -173,8 +59,6 @@ function js_task(debug) {
 					.transform( babelify.configure({}) )
 					.transform( 'browserify-shim' )
 					.plugin('tinyify')
-					.on( 'file', onFile(target) )
-					.on( 'package', onPackage )
 					.bundle()
 					.pipe(source(target))
 					.pipe( gulp.dest( config.destPath ) );
@@ -211,13 +95,11 @@ gulp.task('dev:scss', scss_task( true ) );
 gulp.task('watch', cb => {
 	gulp.watch('./src/scss/**/*.scss',gulp.parallel('dev:scss'));
 	gulp.watch('./src/js/**/*.js',gulp.parallel('dev:js'));
-	gulp.watch('./languages/*.pot',gulp.parallel('i18n:fix-pot'));
-	gulp.watch('./languages/*.po',gulp.parallel('i18n:make-json'));
 });
 
 gulp.task('dev',gulp.series('dev:scss','dev:js','watch'));
 
-gulp.task('i18n', gulp.series( 'i18n:strings-from-json','i18n:make-pot','i18n:fix-pot','i18n:make-json'));
+gulp.task('i18n', gulp.series( 'i18n:make-pot'));
 
 gulp.task('build', gulp.series('build:js','build:scss', 'i18n'));
 
