@@ -7,14 +7,15 @@
   "license": "GPL-3.0-or-later",
   "engines": {},
   "scripts": {
-    "audit": "./vendor/squizlabs/php_codesniffer/bin/phpcs . --report=code --standard=./phpcs-security.ruleset.xml -n -s > ./phpcs-report.txt || exit 0",
+    "audit": "./vendor/squizlabs/php_codesniffer/bin/phpcs . --report=code -n -s > ./phpcs-report.txt || exit 0",
     "audit-fix": "./vendor/squizlabs/php_codesniffer/bin/phpcbf . --standard=./phpcs.ruleset.xml || exit 0",
     "dashicons": "node ./src/run/dashicons.js",
-    "init": "mkdir -p json/acf && mkdir -p json/post-type && mkdir -p json/taxonomy && mkdir -p src/php",
     "dev": "gulp dev",
     "i18n": "node src/run/json-i18n.js acf-wizard",
-    "setversion": "PVER=$(node -e \"console.log(require('./package.json').version);\") && echo \"<?php return '$PVER';\" > ./include/version.php",
-    "rollback": "git reset --hard HEAD~ && git push origin +master"
+    "init": "mkdir -p json/acf && mkdir -p json/post-type && mkdir -p json/taxonomy && mkdir -p src/php",
+    "postinstall": "composer install",
+    "rollback": "git reset --hard HEAD~ && git push origin +master",
+    "setversion": "PVER=$(node -e \"console.log(require('./package.json').version);\") && echo \"<?php return '$PVER';\" > ./include/version.php"
   },
   "browserslist": [
     "last 3 versions",
@@ -76,5 +77,30 @@
     "author": "mcguffin",
     "author_uri": "https://github.com/mcguffin",
     "year": 2023
+  },
+  "wporg": {
+    "steps": [
+      "build",
+      "git",
+      "github",
+      "pack"
+    ],
+    "type": "plugin",
+    "build": {
+      "prebuild": [
+        "wp i18n make-pot . languages/acf-wizard.pot --domain=acf-wizard --exclude=tmp"
+      ],
+      "build": [
+        "gulp build"
+      ]
+    },
+    "git": {
+      "host": "github.com",
+      "user": "mcguffin"
+    },
+    "wporg": {
+      "assets": ".wporg",
+      "svn_user": "podpirate"
+    }
   }
 }

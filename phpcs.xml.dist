@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<ruleset name="BSB-WordPress-Security">
+
+	<!-- Set a description for this ruleset. -->
+	<description>A WordPress Ruleset to check application safety.</description>
+
+	<exclude-pattern>assets/*</exclude-pattern>
+	<exclude-pattern>node_modules/*</exclude-pattern>
+	<exclude-pattern>test/*</exclude-pattern>
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<exclude-pattern>*.js</exclude-pattern>
+	<exclude-pattern>*.css</exclude-pattern>
+
+	<rule ref="Generic.PHP.Syntax"/>
+
+	<!-- Check PHP Compatibility -->
+	<config name="testVersion" value="8.1-"/>
+	<rule ref="PHPCompatibility"/>
+
+	<!-- Include the WordPress ruleset, with exclusions. -->
+	<rule ref="WordPress.CodeAnalysis">
+	</rule>
+	<rule ref="WordPress.DB">
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="acf_wizard"/>
+				<element value="ACFWizard"/>
+				<element value="acf-wizard"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="WordPress.PHP">
+		<!-- omit non security sniffs -->
+		<exclude name="WordPress.PHP.DontExtract"/>
+		<exclude name="WordPress.PHP.YodaConditions"/>
+	</rule>
+	<rule ref="WordPress.Security">
+	</rule>
+	<rule ref="WordPress.Security.EscapeOutput">
+		<properties>
+			<property name="customEscapingFunctions" type="array">
+				<element value="acf_esc_attrs"/>
+				<element value="__"/>
+				<element value="_x"/>
+				<element value="_n"/>
+			</property>
+		</properties>
+    </rule>
+	<rule ref="WordPress.Utils">
+	</rule>
+	<rule ref="WordPress.WP">
+		<exclude name="WordPress.WP.I18n"/>
+	</rule>
+</ruleset>

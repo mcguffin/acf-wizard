@@ -1,0 +1,47 @@
+{
+  "name": "mcguffin/acf-wizard",
+  "description": "Build a First-Run-Wizard in ACF.",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://gist.github.com/mcguffin/255909d4d7fcc241fe63363012553268",
+  "authors": [
+    {
+      "name": "Jörn Lund",
+      "homepage": "https://github.com/mcguffin"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "composer/installers": "~2.0",
+	"php": ">=7.0.0"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "*",
+    "wp-coding-standards/wpcs": "*",
+    "phpcompatibility/php-compatibility": "*",
+	"pheromone/phpcs-security-audit":"*"
+  },
+  "keywords": [
+    "plugin",
+    "wordpress",
+	"acf",
+	"wizard",
+	"dashboard"
+  ],
+  "scripts": {
+    "post-install-cmd": [
+      "[ -f vendor/bin/phpcs ] && \"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/pheromone/phpcs-security-audit,vendor/phpcompatibility/php-compatibility || true"
+    ],
+    "post-update-cmd": [
+      "[ -f vendor/bin/phpcs ] && \"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/pheromone/phpcs-security-audit,vendor/phpcompatibility/php-compatibility || true"
+    ]
+  },
+  "extra": {
+    "installer-name": "acf-wizard"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  }
+}

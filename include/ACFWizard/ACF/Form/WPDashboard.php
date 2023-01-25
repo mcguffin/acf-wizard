@@ -26,7 +26,7 @@ class WPDashboard extends Core\Singleton {
 	public function admin_init() {
 
 		// set post_id
-		$this->post_id = apply_filters( 'acf_wpo_welcome_panel_form_post_id', 'welcome_panel');
+		$this->post_id = apply_filters( 'acf_wizard/welcome_panel_form_post_id', 'welcome_panel');
 
 		$this->welcome_field_groups = acf_get_field_groups( [ 'wp_dashboard' => 'welcome_panel' ] );
 
@@ -44,7 +44,7 @@ class WPDashboard extends Core\Singleton {
 
 		$css = Asset\Asset::get('css/admin/welcome-panel.css')->enqueue();
 
-		if ( ! apply_filters( 'acf_wizard_welcome_dismissable', false ) ) {
+		if ( ! apply_filters( 'acf_wizard/welcome_dismissable', false ) ) {
 
 			wp_add_inline_style($css->handle, '.welcome-panel-close, label[for="wp_welcome_panel-hide"] { display:none; }' );
 
