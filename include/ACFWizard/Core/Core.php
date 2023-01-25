@@ -1,8 +1,6 @@
 <?php
 /**
  *	@package ACFWizard\Core
- *	@version 1.0.1
- *	2018-09-22
  */
 
 namespace ACFWizard\Core;
@@ -17,10 +15,9 @@ class Core extends Plugin implements CoreInterface {
 	 */
 	protected function __construct() {
 
+		add_action( 'acf/init', [ $this, 'acf_init' ] );
 		add_action( 'acf/include_field_types', [ $this, 'register_field_types' ] );
 		add_action( 'acf/include_location_rules', [ $this, 'register_location_rules' ] );
-
-		Form\WPDashboard::instance();
 
 		$args = func_get_args();
 		parent::__construct( ...$args );
@@ -31,6 +28,17 @@ class Core extends Plugin implements CoreInterface {
 	 *
 	 *  @action acf/init
 	 */
+	public function acf_init() {
+
+		Form\WPDashboard::instance();
+
+	}
+
+	/**
+	 *	Register Field types
+	 *
+	 *  @action acf/include_field_types
+	 */
 	public function register_field_types() {
 
 		acf_register_field_type( 'ACFWizard\ACF\Field\WizardProceed' );
@@ -38,6 +46,11 @@ class Core extends Plugin implements CoreInterface {
 
 	}
 
+	/**
+	 *	Register Location
+	 *
+	 *  @action acf/register_location_rules
+	 */
 	public function register_location_rules() {
 
 		acf_register_location_rule( 'ACFWizard\ACF\Location\WPDashboard' );
