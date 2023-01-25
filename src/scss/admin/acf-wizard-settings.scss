@@ -4,3 +4,21 @@
 		display: none;
 	}
 }
+.acf-wizard-prefill-table {
+	td.field {
+		width:30%;
+	}
+	td.value {
+		width:70%;
+	}
+	td.remove {
+		vertical-align: middle;
+	}
+	tr:nth-last-of-type(2) {
+		td.remove {
+			a {
+				display: none;
+			}
+		}
+	}
+}

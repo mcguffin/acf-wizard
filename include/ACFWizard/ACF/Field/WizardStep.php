@@ -3,6 +3,7 @@
 namespace ACFWizard\ACF\Field;
 
 use ACFWizard\Asset;
+use ACFWizard\Core;
 
 class WizardStep extends \acf_field {
 
@@ -125,8 +126,16 @@ class WizardStep extends \acf_field {
 	 */
 	public function input_admin_enqueue_scripts() {
 
+		$core = Core\Core::instance();
+
 		Asset\Asset::get('css/admin/acf-wizard.css')->enqueue();
-		Asset\Asset::get('js/admin/acf-wizard.js')->enqueue();
+		Asset\Asset::get('js/admin/acf-wizard.js')
+			->localize( [
+				'i18n' => [
+					'noneChoice' => __('- none -', 'acf-wizard' ),
+				],
+			], $core->get_prefix().'_field_groups' )
+			->enqueue();
 
 	}
 

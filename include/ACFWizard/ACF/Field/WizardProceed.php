@@ -20,17 +20,21 @@ class WizardProceed extends \acf_field {
 		$this->label = __('Wizard Action', 'acf-wizard' );
 		$this->category = 'layout';
 		$this->defaults = [
-			'wizard_action' => 'forward', // forward | back | goto
-			'wizard_steps'  => 1, // # steps
-			'wizard_target' => '', // wizard page field key
-			'style'         => 'primary', // primary | secondary | link
-			'button_label'  => __( 'Continue', 'acf-wizard' ),
-			'prefill'       => [], // prefill current form. supports select, radio, checkbox, email, url, text, textarea, wysiwyg, color, date
-			'button_align'  => 'right',
-			'hide_label'    => 1,
+			'wizard_action'  => 'forward', // forward | back | goto
+			'wizard_steps'   => 1, // # steps
+			'wizard_target'  => '', // wizard page field key
+			'style'          => 'primary', // primary | secondary | link
+			'button_label'   => __( 'Continue', 'acf-wizard' ),
+			'enable_prefill' => 0,
+			/**  @var array[] [ 'field_key' = 'field_...', 'value' => '...' ] */
+			'prefill_values' => [], // prefill current form. supports select, radio, checkbox, email, url, text, textarea, wysiwyg, color, date
+			'button_align'   => 'right',
+			'hide_label'     => 1,
 		];
 
 		add_filter( 'acf/field_wrapper_attributes', [ $this, 'wrapper_attributes'], 9, 2 );
+
+		add_action( 'acf/render_field/type=prefill_values', [ $this, 'render_prefill' ] );
 
 		parent::__construct();
 	}
@@ -123,6 +127,19 @@ class WizardProceed extends \acf_field {
 			]
 		);
 
+		acf_render_field_setting(
+			$field,
+			[
+				'label'        => __( 'Enable Prefill', 'acf-wizard' ),
+				'instructions' => __( 'Fill out form values','acf-wizard' ),
+				'type'         => 'true_false',
+				'name'         => 'enable_prefill',
+				'ui'           => 1,
+			]
+		);
+
+		$this->render_prefill_values( $field );
+
 	}
 
 	/**
@@ -190,17 +207,101 @@ class WizardProceed extends \acf_field {
 	public function render_field( $field ) {
 
 		$atts = [
-			'type'               => 'button',
-			'class'              => 'acf-wizard-btn button-'.$field['style'],
-			'data-wizard-action' => $field['wizard_action'],
-			'data-wizard-target' => $field['wizard_target'],
-			'data-wizard-steps'  => $field['wizard_steps'],
+			'type'                => 'button',
+			'class'               => 'acf-wizard-btn button-'.$field['style'],
+			'data-wizard-action'  => $field['wizard_action'],
+			'data-wizard-target'  => $field['wizard_target'],
+			'data-wizard-steps'   => $field['wizard_steps'],
+			'data-wizard-prefill' => $field['enable_prefill']
+				? $this->sanitize_prefill_values( $field['prefill_values'] )
+				: json_encode( false ),
 		];
 		?>
 		<button <?php echo acf_esc_attrs( $atts ); ?>>
 			<?php echo esc_html( $field['button_label'] ); ?>
 		</button>
 		<?php
+	}
+
+	/**
+	 *	@inheritdoc
+	 */
+	public function render_prefill_values( $field ) {
+		$condition = [ 'field' => 'enable_prefill', 'operator' => '==', 'value' => '1' ];
+		// acf-field acf-field-number acf-field-setting-wizard_steps acf-field-appended
+		?>
+		<div class="acf-field acf-field-setting-prefill_values" data-type="prefill_values" data-key="prefill_values" data-name="prefill_values" data-setting="wizard_proceed" data-conditions="<?php echo esc_attr( json_encode( $condition ) ) ?>">
+			<div class="acf-label">
+				<label><?php esc_html_e( 'Prefill Fields', 'acf-wizard' ); ?></label>
+			</div>
+			<?php
+
+			$tblAttr = [
+				'class' => 'acf-table -clear acf-wizard-prefill-table',
+			];
+			$prefill_values = $this->sanitize_prefill_values( $field['prefill_values'] );
+
+			?><pre><?php var_dump($prefill_values);?></pre>
+			<input type="hidden" name="<?php echo esc_attr( $field['prefix'] ); ?>[prefill_values]" value="0">
+			<table <?php echo acf_esc_attrs( $tblAttr ); ?>>
+				<tbody>
+					<?php
+					foreach ( $prefill_values as $i => $prefill_value )	{
+						$prefill_field = get_field_object( $prefill_value['field_key'] );
+						?>
+						<tr class="prefill" data-index="<?php echo esc_attr($i); ?>">
+							<td class="field">
+								<select name="<?php echo esc_attr( $field['prefix'] ); ?>[prefill_values][<?php echo esc_attr( $i ); ?>][field_key]">
+									<option value="" selected><?php esc_html_e( '- none -', 'acf-wizard' ); ?></option>
+									<option value="<?php echo $prefill_value['field_key']; ?>" selected><?php  ?></option>
+								</select>
+							</td>
+							<td class="value">
+								<?php
+								$tpl = '<input type="hidden" name="%1$s[prefill_values][%2$d][value]%4$s" value="%3$s" />';
+								if ( is_array( $prefill_value['val'] ) ) {
+									array_map( function ( $val ) use ( $tpl, $field, $i ) {
+										printf(
+											$tpl,
+											esc_attr( $field['prefix'] ),
+											esc_attr( $i ),
+											esc_attr( $val ),
+											'[]'
+										);
+									}, $prefill_value['val'] );
+								} else {
+									printf(
+										$tpl,
+										esc_attr( $field['prefix'] ),
+										esc_attr( $i ),
+										esc_attr( $prefill_value['val'] ),
+										''
+									);
+								}
+								?>
+							</td>
+							<td class="remove">
+								<a href="#" class="acf-icon -minus remove-prefill-value"></a>
+							</td>
+						</tr>
+						<?php
+					}
+					?>
+					<tr class="prefill acf-wizard-prefill-template acf-hidden" data-index="__idx__" >
+						<td class="field">
+							<select></select>
+						</td>
+						<td class="value"><input type="hidden" /></td>
+						<td class="remove">
+							<a href="#" class="acf-icon -minus remove-prefill-value"></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<?php
+
 	}
 
 	/**
@@ -219,11 +320,41 @@ class WizardProceed extends \acf_field {
 
 	}
 
+	/**
+	 *	@param mixed $prefill
+	 *	@return array
+	 */
+	public function sanitize_prefill_values( $prefill ) {
+		return array_map(
+			function( $item ) {
+				$item['val'] = is_array( $item['val'] )
+					? array_map( 'trim', $item['val'] )
+					: trim($item['val']);
+				$item['field_key'] = trim($item['field_key']);
+				return $item;
+			},
+			array_values(
+				array_filter( (array) $prefill, function($val) {
+					return is_array($val) && isset( $val['field_key'], $val['val'] ) && ! empty( $val['field_key'] );
+				} )
+			)
+		);
+	}
+
+	/**
+	 *	@inheritdoc
+	 */
+	public function update_field( $field ) {
+		// sanitize steps
+		$field['prefill_values'] = $this->sanitize_prefill_values( $field['prefill_values'] );
+
+		return $field;
+	}
 
 	/**
 	 * @inheritdoc
 	 */
-	function load_field( $field ) {
+	public function load_field( $field ) {
 
 		// remove name to avoid caching issue
 		$field['name'] = '';
@@ -233,6 +364,7 @@ class WizardProceed extends \acf_field {
 
 		// set value other than 'null' to avoid ACF loading / caching issue
 		$field['value'] = false;
+
 
 		// return
 		return $field;
