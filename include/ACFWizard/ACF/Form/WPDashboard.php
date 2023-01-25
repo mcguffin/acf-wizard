@@ -38,7 +38,7 @@ class WPDashboard extends Core\Singleton {
 		$this->post_id = apply_filters( 'acf_wizard/welcome_panel_form_post_id', $this->post_id );
 
 		/**
-		 *	Required capability for showing a form in the welcome screen.
+		 *	Filters the capability required to show the form on the welcome screen.
 		 *	Additionally WordPress requires the `edit_theme_options` capability
 		 *	to show the welcome screen, regardless of what your filter hook returns.
 		 *
@@ -64,9 +64,9 @@ class WPDashboard extends Core\Singleton {
 		$css = Asset\Asset::get('css/admin/welcome-panel.css')->enqueue();
 
 		/**
-		 *	Allow to dismiss the welcome screen.
+		 *	Filters whether the user is allowed to dismiss the ACF welcome screen.
 		 *
-		 *	@param boolean Whether the user is allowed to dismiss the ACF welcome screen. Default `false`
+		 *	@param boolean Default `false`
 		 */
 		if ( ! apply_filters( 'acf_wizard/welcome_dismissable', false ) ) {
 
@@ -96,6 +96,11 @@ class WPDashboard extends Core\Singleton {
 			<form class="acf-form" method="post">
 				<?php
 
+				/**
+				 *	Fired before acf fields are being rendered
+				 */
+				do_action('acf_wizard/welcome_panel_before_fields' );
+
 				acf_form_data([
 					'screen'     => 'welcome_panel',
 					'post_id'    => $this->post_id,
@@ -117,13 +122,28 @@ class WPDashboard extends Core\Singleton {
 					<?php
 
 				}
+
+				/**
+				 *	Fired after acf fields have been rendered
+				 */
+				do_action('acf_wizard/welcome_panel_after_fields' );
+
+				/**
+				 *	Whether to print the submit section in the welcome panel
+				 *
+				 *	@param boolean Default `false`
+				 */
+				if ( apply_filters( 'acf_wizard/print_welcome_panel_submit', true ) ) {
+					?>
+					<div class="acf-form-submit">
+						<span class="acf-spinner spinner"></span>
+						<button type="submit" class="acf-button button button-primary button-large">
+							<?php esc_html_e( 'Submit', 'acf-wizard' ); ?>
+						</button>
+					</div>
+					<?php
+				}
 				?>
-				<div class="acf-form-submit">
-					<span class="acf-spinner spinner"></span>
-					<button type="submit" class="acf-button button button-primary button-large">
-						<?php esc_html_e( 'Submit', 'acf-wizard' ); ?>
-					</button>
-				</div>
 			</form>
 		</div>
 		<?php

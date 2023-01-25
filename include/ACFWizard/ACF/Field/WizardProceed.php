@@ -84,6 +84,7 @@ class WizardProceed extends \acf_field {
 					'forward'=> __( 'Forward', 'acf-wizard' ),
 					'back'   => __( 'Back', 'acf-wizard' ),
 					'goto'   => __( 'Goto Page', 'acf-wizard' ),
+					'submit' => __( 'Submit Form', 'acf-wizard' ),
 				],
 			]
 		);
@@ -101,9 +102,16 @@ class WizardProceed extends \acf_field {
 				'step'         => 1,
 				'append'       => __( 'Steps', 'acf-wizard' ),
 				'conditions'   => [
-					'field'    => 'wizard_action',
-					'operator' => '!=',
-					'value'    => 'goto',
+					[
+						'field'    => 'wizard_action',
+						'operator' => '!=',
+						'value'    => 'goto',
+					],
+					[
+						'field'    => 'wizard_action',
+						'operator' => '!=',
+						'value'    => 'submit',
+					],
 				],
 			]
 		);
@@ -135,6 +143,13 @@ class WizardProceed extends \acf_field {
 				'type'         => 'true_false',
 				'name'         => 'enable_prefill',
 				'ui'           => 1,
+				'conditions'   => [
+					[
+						'field'    => 'wizard_action',
+						'operator' => '!=',
+						'value'    => 'submit',
+					],
+				],
 			]
 		);
 
@@ -233,16 +248,26 @@ class WizardProceed extends \acf_field {
 	 */
 	public function render_field( $field ) {
 
-		$atts = [
-			'type'                => 'button',
-			'class'               => 'acf-wizard-btn button-'.$field['style'],
-			'data-wizard-action'  => $field['wizard_action'],
-			'data-wizard-target'  => $field['wizard_target'],
-			'data-wizard-steps'   => $field['wizard_steps'],
-			'data-wizard-prefill' => $field['enable_prefill']
-				? $this->sanitize_prefill_values( $field['prefill_values'] )
-				: json_encode( false ),
-		];
+		if ( 'submit' === $field['wizard_action'] ) {
+			$atts = [
+				'type' => 'submit',
+			];
+
+		} else {
+			$atts = [
+				'type'                => 'button',
+				'data-wizard-action'  => $field['wizard_action'],
+				'data-wizard-target'  => $field['wizard_target'],
+				'data-wizard-steps'   => $field['wizard_steps'],
+				'data-wizard-prefill' => $field['enable_prefill']
+					? $this->sanitize_prefill_values( $field['prefill_values'] )
+					: json_encode( false ),
+			];
+
+		}
+
+		$atts['class'] = 'acf-wizard-btn button-'.$field['style'];
+
 		?>
 		<button <?php echo acf_esc_attrs( $atts ); ?>>
 			<?php echo esc_html( $field['button_label'] ); ?>
@@ -254,8 +279,20 @@ class WizardProceed extends \acf_field {
 	 *	@inheritdoc
 	 */
 	public function render_prefill_values( $field ) {
-		$condition = [ 'field' => 'enable_prefill', 'operator' => '==', 'value' => '1' ];
-		// acf-field acf-field-number acf-field-setting-wizard_steps acf-field-appended
+
+		$condition = [
+			[
+				'field'    => 'wizard_action',
+				'operator' => '!=',
+				'value'    => 'submit',
+			],
+			[
+				'field' => 'enable_prefill',
+				'operator' => '==',
+				'value' => '1',
+			],
+		];
+
 		?>
 		<div class="acf-field acf-field-setting-prefill_values" data-type="prefill_values" data-key="prefill_values" data-name="prefill_values" data-setting="wizard_proceed" data-conditions="<?php echo esc_attr( json_encode( $condition ) ) ?>">
 			<div class="acf-label">
