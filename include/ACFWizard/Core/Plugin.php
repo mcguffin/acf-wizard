@@ -11,7 +11,7 @@ if ( ! defined('ABSPATH') ) {
 	die('FU!');
 }
 
-class Plugin extends Singleton implements ComponentInterface {
+class Plugin extends Singleton {
 
 	/** @var string plugin prefix */
 	private $plugin_prefix = 'acf_wizard';
@@ -25,10 +25,6 @@ class Plugin extends Singleton implements ComponentInterface {
 	/** @var string plugin version */
 	private $_version;
 
-	/** @var string plugin components which might need upgrade */
-	private static $components = array(
-	);
-
 	/**
 	 *	@inheritdoc
 	 */
@@ -36,13 +32,7 @@ class Plugin extends Singleton implements ComponentInterface {
 
 		$this->plugin_file = $file;
 
-		register_activation_hook( $this->get_plugin_file(), array( $this , 'activate' ) );
-		register_deactivation_hook( $this->get_plugin_file(), array( $this , 'deactivate' ) );
-		register_uninstall_hook( $this->get_plugin_file(), array( __CLASS__, 'uninstall' ) );
-
-		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
-
-		add_action( 'plugins_loaded' , array( $this , 'load_textdomain' ) );
+		add_action( 'plugins_loaded' , [ $this, 'load_textdomain' ] );
 
 		parent::__construct();
 	}
@@ -126,26 +116,6 @@ class Plugin extends Singleton implements ComponentInterface {
 		return $this->plugin_meta;
 	}
 
-
-	/**
-	 *	@action plugins_loaded
-	 */
-	public function maybe_upgrade() {
-		// trigger upgrade
-		$new_version = $this->version();
-		$old_version = get_site_option( $this->plugin_prefix . '_version' );
-
-		// call upgrade
-		if ( version_compare($new_version, $old_version, '>' ) ) {
-
-			$this->upgrade( $new_version, $old_version );
-
-			update_site_option( $this->plugin_prefix . '_version', $new_version );
-
-		}
-
-	}
-
 	/**
 	 *	Load text domain
 	 *
@@ -154,69 +124,6 @@ class Plugin extends Singleton implements ComponentInterface {
 	public function load_textdomain() {
 		$path = pathinfo( $this->get_wp_plugin(), PATHINFO_DIRNAME );
 		load_plugin_textdomain( 'acf-wizard', false, $path . '/languages' );
-	}
-
-
-
-	/**
-	 *	Fired on plugin activation
-	 */
-	public function activate() {
-
-		$this->maybe_upgrade();
-
-		foreach ( self::$components as $component ) {
-			$comp = $component::instance();
-			$comp->activate();
-		}
-	}
-
-
-	/**
-	 *	Fired on plugin updgrade
-	 *
-	 *	@param string $nev_version
-	 *	@param string $old_version
-	 *	@return array(
-	 *		'success' => bool,
-	 *		'messages' => array,
-	 * )
-	 */
-	public function upgrade( $new_version, $old_version ) {
-
-		$result = array(
-			'success'	=> true,
-			'messages'	=> array(),
-		);
-
-		foreach ( self::$components as $component ) {
-			$comp = $component::instance();
-			$upgrade_result = $comp->upgrade( $new_version, $old_version );
-			$result['success'] 		&= $upgrade_result['success'];
-			$result['messages'][]	=  $upgrade_result['message'];
-		}
-
-		return $result;
-	}
-
-	/**
-	 *	Fired on plugin deactivation
-	 */
-	public function deactivate() {
-		foreach ( self::$components as $component ) {
-			$comp = $component::instance();
-			$comp->deactivate();
-		}
-	}
-
-	/**
-	 *	Fired on plugin deinstallation
-	 */
-	public static function uninstall() {
-		foreach ( self::$components as $component ) {
-			$comp = $component::instance();
-			$comp->uninstall();
-		}
 	}
 
 }
