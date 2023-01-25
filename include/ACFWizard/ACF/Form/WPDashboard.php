@@ -7,9 +7,14 @@ use ACFWizard\Core;
 
 class WPDashboard extends Core\Singleton {
 
+	/** @var Array */
 	private $welcome_field_groups = null;
 
+	/** @var int|string */
 	private $post_id = 'welcome_panel';
+
+	/** @var string */
+	private $capability = 'edit_theme_options';
 
 	/**
 	 *	@inheritdoc
@@ -25,8 +30,23 @@ class WPDashboard extends Core\Singleton {
 	 */
 	public function admin_init() {
 
-		// set post_id
-		$this->post_id = apply_filters( 'acf_wizard/welcome_panel_form_post_id', 'welcome_panel');
+		/**
+		 *	ACF-Post ID for welcome screen values.
+		 *
+		 *	@param int|string Post ID. Default `welcome_panel`
+		 */
+		$this->post_id = apply_filters( 'acf_wizard/welcome_panel_form_post_id', $this->post_id );
+
+		/**
+		 *	Required capability for showing a form in the welcome screen.
+		 *	Additionally WordPress requires the `edit_theme_options` capability
+		 *	to show the welcome screen, regardless of what your filter hook returns.
+		 *
+		 *	@param string Capability Default `edit_theme_options`
+		 */
+		if ( ! current_user_can( apply_filters( 'acf_wizard/welcome_panel_capability', $this->capability ) ) ) {
+			return;
+		}
 
 		$this->welcome_field_groups = acf_get_field_groups( [ 'wp_dashboard' => 'welcome_panel' ] );
 
@@ -36,14 +56,18 @@ class WPDashboard extends Core\Singleton {
 
 		// replace welcome panel
 		remove_action( 'welcome_panel', 'wp_welcome_panel' );
-
-		add_action('welcome_panel', [ $this, 'render_form' ] );
+		add_action( 'welcome_panel', [ $this, 'render_form' ] );
 
 		// assets
 		acf_enqueue_scripts();
 
 		$css = Asset\Asset::get('css/admin/welcome-panel.css')->enqueue();
 
+		/**
+		 *	Allow to dismiss the welcome screen.
+		 *
+		 *	@param boolean Whether the user is allowed to dismiss the ACF welcome screen. Default `false`
+		 */
 		if ( ! apply_filters( 'acf_wizard/welcome_dismissable', false ) ) {
 
 			wp_add_inline_style($css->handle, '.welcome-panel-close, label[for="wp_welcome_panel-hide"] { display:none; }' );
@@ -62,6 +86,9 @@ class WPDashboard extends Core\Singleton {
 
 	}
 
+	/**
+	 *	@action welcome_panel
+	 */
 	public function render_form() {
 
 		?>
@@ -70,7 +97,7 @@ class WPDashboard extends Core\Singleton {
 				<?php
 
 				acf_form_data([
-					'screen'     => 'wp_dashboard',
+					'screen'     => 'welcome_panel',
 					'post_id'    => $this->post_id,
 					'validation' => true,
 				]);
@@ -102,10 +129,12 @@ class WPDashboard extends Core\Singleton {
 		<?php
 	}
 
-
+	/**
+	 *	@action load-index.php
+	 */
 	public function process_form() {
 
-		if ( ! acf_validate_save_post() ) {
+		if ( ! acf_verify_nonce( 'welcome_panel' ) || ! acf_validate_save_post() ) {
 			return;
 		}
 		acf_save_post( $this->post_id );
