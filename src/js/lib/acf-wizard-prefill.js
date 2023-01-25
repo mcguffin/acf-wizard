@@ -23,10 +23,11 @@ class WizardPrefill {
 		this.prefillRows.forEach( row => this.setupRow(row) )
 		this.maybeAppendRow()
 		this.field.save();
+		this.disableDuplicates()
 	}
 
 	maybeAppendRow() {
-		const rows        = this.prefillRows
+		const rows = this.prefillRows
 		let newRow = false,
 			rowTemplate,
 			uid
@@ -40,6 +41,24 @@ class WizardPrefill {
 			newRow.querySelector('td.field select').setAttribute('name',`${this.field.getInputName()}[prefill_values][${uid}][field_key]`)
 			newRow.classList.remove('acf-wizard-prefill-template','acf-hidden')
 		}
+
+	}
+
+	disableDuplicates() {
+
+		const used = Array.from(this.prefillRows)
+			.map( row => this.getRowFieldKey(row) )
+			.filter( el => el !== undefined && el.indexOf('field_') === 0 )
+			.map( fieldKey => {
+				this.table
+					.querySelectorAll(`tr:not(.acf-hidden) td.field option[value="${fieldKey}"]`)
+					.forEach( el => {
+						if ( el.selected ) {
+							return
+						}
+						el.disabled = true
+					} )
+		} )
 
 	}
 
@@ -83,8 +102,8 @@ class WizardPrefill {
 					return false
 				}
 				return {
-					id,
-					text: text.trim() ? text.trim() : id
+					id: id.trim(),
+					text: text ? text.trim() : id
 				}
 			})
 			.filter( el => el !== false )

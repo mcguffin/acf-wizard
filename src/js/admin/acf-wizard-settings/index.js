@@ -39,12 +39,15 @@ const getPrefillFieldChoices = () => {
 const renderSelects = () => {
 	// render navigation target selects
 	acf.getFieldObjects({type:'wizard_proceed'}).forEach( field => {
+
 		acf.renderSelect(field.$el.find('[data-name="wizard_target"] select'), getTargetChoices() );
 
 		const prefillChoices = getPrefillFieldChoices()
 
 		field.$el.find('tr.prefill td.field select').each( (i,el) => {
 			acf.renderSelect( $(el), prefillChoices );
+			// TODO: disable duplicates
+			WizardPrefill.factory(field).update()
 		})
 
 	})

@@ -118,7 +118,7 @@ class WizardProceed extends \acf_field {
 				'wrapper'      => [ 'width' => 50, ],
 				'ui'           => 0,
 				'multiple'     => 0,
-				'choices'      => [],
+				'choices'      => $this->get_wizard_step_choices( $field ),
 				'conditions'   => [
 					'field'    => 'wizard_action',
 					'operator' => '==',
@@ -140,6 +140,33 @@ class WizardProceed extends \acf_field {
 
 		$this->render_prefill_values( $field );
 
+	}
+
+	/**
+	 *	@param array $field
+	 *	@return array
+	 */
+	private function get_wizard_step_choices( $field ) {
+		$fields = array_map(
+			function( $field ) {
+				return array_intersect_key( $field,
+					[
+						'key' => '',
+						'label' => '',
+					]
+				);
+			},
+			array_filter(
+				acf_get_fields( $field['parent'] ),
+				function( $field ) {
+					return $field['type'] === 'wizard_step';
+				}
+			)
+		);
+		return array_combine(
+			array_map( function( $choice ) { return $choice['key']; }, $fields ),
+			array_map( function( $choice ) { return $choice['label']; }, $fields )
+		);
 	}
 
 	/**
@@ -240,7 +267,7 @@ class WizardProceed extends \acf_field {
 				'class' => 'acf-table -clear acf-wizard-prefill-table',
 			];
 			$prefill_values = $this->sanitize_prefill_values( $field['prefill_values'] );
-
+			/* */
 			?><pre><?php var_dump($prefill_values);?></pre>
 			<input type="hidden" name="<?php echo esc_attr( $field['prefix'] ); ?>[prefill_values]" value="0">
 			<table <?php echo acf_esc_attrs( $tblAttr ); ?>>
