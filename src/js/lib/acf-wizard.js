@@ -1,5 +1,5 @@
 
-class Wizard {
+class Wizard extends EventTarget {
 	/** @var Array */
 	static #instances = []
 
@@ -32,57 +32,57 @@ class Wizard {
 	stepper
 
 	/** @var Array */
-	steps = []
+	navigationElements = []
+
+	/** @return NodeList */
+	get steps() {
+		return this.parent.querySelectorAll(':scope > .acf-field-wizard-step');
+	}
 
 	get currentStep() {
 		let cur = false
-		this.parent
-			.querySelectorAll('.acf-field-wizard-step')
-			.forEach( el => cur = el.matches('.active') ? el : cur )
+		this.steps.forEach( el => cur = el.matches('.active') ? el : cur )
 		return cur
 	}
 
 	get currentNavItem() {
 		let navItem = false
-		try {
-			this.parent
-				.querySelectorAll('.acf-field-wizard-step')
-				.forEach( el => {
-					const testNavItem = this.stepper.querySelector(`[data-wizard-target="${el.getAttribute('data-key')}"]`)
-					if ( testNavItem ) {
-						navItem = testNavItem
-					}
-					if ( el.matches('.active') ) {
-						throw ''
-					}
-				})
-
-		} catch(err) {}
+		Array.from(this.steps).every( el => {
+			const testNavItem = this.stepper.querySelector(`[data-wizard-target="${el.getAttribute('data-key')}"]`)
+			if ( testNavItem ) {
+				navItem = testNavItem
+			}
+			if ( el.matches('.active') ) {
+				return false
+			}
+			return true
+		})
 		return navItem
 	}
 
 	get currentIndex() {
 		let idx = -1
-		this.parent
-			.querySelectorAll('.acf-field-wizard-step')
-			.forEach( (el,i) => idx = el.matches('.active') ? i : idx )
+		this.steps.forEach( (el,i) => idx = el.matches('.active') ? i : idx )
 		return idx
 	}
 
 	set currentIndex( idx ) {
-		this.parent
-			.querySelectorAll('.acf-field-wizard-step')
-			.forEach( (el,i) => {
-				if ( idx === i ) {
-					this.goto(el.getAttribute('data-key'))
-				}
-			} )
+		Array.from(this.steps).every( (el,i) => {
+			if ( idx === i ) {
+				this.goto(el.getAttribute('data-key'))
+				return false;
+			}
+			return true;
+		} )
 	}
 
 	/**
 	 *	@param parent DOMNode
 	 */
 	constructor( parent ) {
+
+		super()
+
 		const idx = Wizard.#instances.length
 
 		this.parent = parent
@@ -104,7 +104,6 @@ class Wizard {
 					.forEach( el => {
 						el.disabled = isHidden
 					} )
-
 			})
 		})
 
@@ -114,6 +113,8 @@ class Wizard {
 	destructor() {
 		this.#observer.disconnect()
 	}
+
+
 
 	/**
 	 *	@param el DOMNode
@@ -160,6 +161,14 @@ class Wizard {
 	 */
 	goto(fieldKey) {
 		let navKey
+
+		const navigateEvent = new Event('acf_wizard/navigate', { cancelable: true })
+		this.dispatchEvent( navigateEvent )
+
+		if ( navigateEvent.defaultPrevented ) {
+			return;
+		}
+
 		this.parent
 			.querySelector(`:scope > [data-key="${fieldKey}"]`)
 			.classList.add('active')
@@ -188,9 +197,26 @@ class Wizard {
 			this.parent.setAttribute('data-show-stepper', step.getAttribute('data-show-stepper') )
 		}
 
+		this.dispatchEvent( new Event('acf_wizard/navigated') )
 
 		return this
 	}
+
+	canNavigateSteps(steps) {
+		const wizardSteps = this.steps
+		const idx = this.currentIndex
+		const newIdx = Math.min(
+			Math.max( 0, idx + steps),
+			wizardSteps.length -1
+		)
+		return !! wizardSteps[newIdx] && wizardSteps[newIdx].matches(':not(.acf-hidden)')
+
+	}
+
+	canNavigate(fieldKey) {
+		return this.parent.querySelector(`[data-key="${fieldKey}"]`).matches(':not(.acf-hidden)')
+	}
+
 
 	static navigate(el) {
 		const wizard = Wizard.findByElement(el)
