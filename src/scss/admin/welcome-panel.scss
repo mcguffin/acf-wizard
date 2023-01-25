@@ -4,6 +4,10 @@
 .welcome-panel {
 	.postbox {
 		margin-bottom: 0;
+		.inside.acf-welcome-panel-fields {
+			padding: 0;
+			margin: 0;
+		}
 	}
 	.acf-form-submit {
 		display: flex;

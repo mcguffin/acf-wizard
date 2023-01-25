@@ -4,7 +4,12 @@ namespace ACFWizard\ACF\Field;
 
 use ACFWizard\Asset;
 
-class WizardProceed extends AbstractWizardField {
+class WizardProceed extends \acf_field {
+
+	/**
+	 * @var bool
+	 */
+	public $show_in_rest = false;
 
 	/**
 	 *	@inheritdoc
@@ -21,28 +26,30 @@ class WizardProceed extends AbstractWizardField {
 			'style'         => 'primary', // primary | secondary | link
 			'button_label'  => __( 'Continue', 'acf-wizard' ),
 			'prefill'       => [], // prefill current form. supports select, radio, checkbox, email, url, text, textarea, wysiwyg, color, date
+			'button_align'  => 'right',
+			'hide_label'    => 1,
 		];
+
+		add_filter( 'acf/field_wrapper_attributes', [ $this, 'wrapper_attributes'], 9, 2 );
 
 		parent::__construct();
 	}
 
 	/**
-	 *	@inheritdoc
+	 *	@filter acf/field_wrapper_attributes
 	 */
-	public function render_field_settings( $field ) {
-		/*
-		# general
-		label text
-		wizard_action select
-			forward
-			back
-			goto
-		wizard_steps number
-		wizard_goto select
-			field_key => name
-		*/
+	public function wrapper_attributes( $wrapper, $field ) {
 
+		if ( $this->name === $field['type'] ) {
+
+			$wrapper['class'] .= sprintf(' button-align-%s', $field['button_align']);
+			if ( $field['hide_label'] ) {
+				$wrapper['class'] .= ' no-label';
+			}
+		}
+		return $wrapper;
 	}
+
 
 	/**
 	 * @inheritdoc
@@ -133,6 +140,16 @@ class WizardProceed extends AbstractWizardField {
 		acf_render_field_setting(
 			$field,
 			[
+				'label'        => __( 'Hide Label', 'acf-wizard' ),
+				'instructions' => __( 'Hide Label and Instructions','acf-wizard' ),
+				'type'         => 'true_false',
+				'name'         => 'hide_label',
+				'ui'           => 1,
+			]
+		);
+		acf_render_field_setting(
+			$field,
+			[
 				'label'        => __( 'Style', 'acf-wizard' ),
 				'instructions' => '',
 				'type'         => 'select',
@@ -146,6 +163,24 @@ class WizardProceed extends AbstractWizardField {
 				],
 			]
 		);
+
+		acf_render_field_setting(
+			$field,
+			[
+				'label'        => __( 'Button Alignment', 'acf-wizard' ),
+				'instructions' => '',
+				'type'         => 'select',
+				'name'         => 'button_align',
+				'ui'           => 0,
+				'multiple'     => 0,
+				'choices'      => [
+					'left'   => __( 'Left', 'acf-wizard' ),
+					'center' => __( 'Center', 'acf-wizard' ),
+					'right'  => __( 'Right', 'acf-wizard' ),
+				],
+			]
+		);
+
 	}
 
 
@@ -183,4 +218,26 @@ class WizardProceed extends AbstractWizardField {
 			->enqueue();
 
 	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	function load_field( $field ) {
+
+		// remove name to avoid caching issue
+		$field['name'] = '';
+
+		// remove required to avoid JS issues
+		$field['required'] = 0;
+
+		// set value other than 'null' to avoid ACF loading / caching issue
+		$field['value'] = false;
+
+		// return
+		return $field;
+
+	}
+
+
 }

@@ -5,11 +5,18 @@
 .acf-field-wizard-step:not(.active) ~ :not(.active ~ *) {
 	display: none;
 }
-
+.acf-field-wizard-step {
+	& + .acf-field {
+		border-top-style:none;
+	}
+}
 .acf-wizard-stepper {
 	display: flex;
 	justify-content: center;
 	padding: 10px;
+	[data-show-stepper="0"] > & {
+		display:none;
+	}
 	.acf-wizard-nav-item {
 		appearance: none;
 		border: none;
@@ -48,6 +55,27 @@
 			height:0;
 			margin:0 15px;
 			border-top:2px dotted currentColor;
+		}
+	}
+}
+
+
+
+.acf-field-wizard-proceed {
+	&.button-align-center {
+		.acf-label, .acf-input {
+			text-align:center;
+		}
+	}
+	&.button-align-right {
+		.acf-label, .acf-input {
+			text-align:right;
+		}
+	}
+	&.no-label {
+		.acf-input .description,
+		> .acf-label {
+			display: none;
 		}
 	}
 }

@@ -4,7 +4,7 @@ namespace ACFWizard\ACF\Field;
 
 use ACFWizard\Asset;
 
-class WizardStep extends AbstractWizardField {
+class WizardStep extends \acf_field {
 
 	/**
 	 * @var bool
@@ -18,38 +18,32 @@ class WizardStep extends AbstractWizardField {
 
 		$this->name = 'wizard_step';
 		$this->label = __('Wizard Step', 'acf-wizard' );
-		$this->category = 'layout'; // basic | content | choice | relational | jquery | layout | CUSTOM GROUP NAME
+		$this->category = 'layout';
 		$this->defaults = [
-			// 'show_steps' => 1,
-			// 'show_title' => 1,
-			'endpoint'          => 0,
-			'navigation_style'  => 'name_number',
+			'endpoint'         => 0,
+			'navigation_style' => 'name_number',
+			'show_stepper'     => 1,
 		];
 
-		add_filter('acf/field_wrapper_attributes', [ $this, 'wrapper_attributes'], 9, 2 );
+		add_filter( 'acf/field_wrapper_attributes', [ $this, 'wrapper_attributes'], 9, 2 );
 
 		parent::__construct();
 	}
 
+	/**
+	 *	@filter acf/field_wrapper_attributes
+	 */
 	public function wrapper_attributes( $wrapper, $field ) {
+
 		if ( $this->name === $field['type'] ) {
 
-			$wrapper['data-wizard-nav'] = $field['navigation_style'];
-			$wrapper['data-wizard-end'] = $field['endpoint'];
+			$wrapper['data-wizard-nav']   = $field['navigation_style'];
+			$wrapper['data-wizard-end']   = $field['endpoint'];
+			$wrapper['data-show-stepper'] = $field['show_stepper'];
 
 		}
 		return $wrapper;
 	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function render_field_settings( $field ) {
-
-
-	}
-
-
 
 	/**
 	 * @inheritdoc
@@ -82,7 +76,7 @@ class WizardStep extends AbstractWizardField {
 		acf_render_field_setting(
 			$field,
 			[
-				'label'        => __( 'Navigation style', 'acf-wizard' ),
+				'label'        => __( 'Stepper Navigation style', 'acf-wizard' ),
 				'instructions' => '',
 				'type'         => 'select',
 				'name'         => 'navigation_style',
@@ -102,40 +96,25 @@ class WizardStep extends AbstractWizardField {
 			]
 		);
 
-	}
+		acf_render_field_setting(
+			$field,
+			[
+				'label'        => __( 'Show Stepper','acf-wizard' ),
+				'instructions' => '',
+				'type'         => 'true_false',
+				'name'         => 'show_stepper',
+				'ui'           => 1,
+			]
+		);
 
-	// /**
-	//  * @inheritdoc
-	//  */
-	// public function render_field_conditional_logic_settings( $field ) {
-	// }
+	}
 
 
 	/**
 	 * @inheritdoc
 	 */
-	public function render_field( $field ) {
-		$atts = [
-			'class'            => 'acf-wizard-step',
-			'data-key'         => $field['key'],
-			'data-stepper-key' => $field['navigation_style'],
-			'data-step-name'   => $field['name'],
-			'data-step-number' => -1, // counter? reset if endpoint...
-		];
-		foreach ( explode( '_', $field['navigation_style'] ) as $nav_el ) {
-			$atts['class'] .= " acf-wizard-nav-{$nav_el}";
-		}
-
-		if ( $field['endpoint'] ) {
-			$atts['class'] .= ' acf-wizard-end';
-		}
-
-		?>
-		<div <?php echo acf_esc_attrs( $atts ); ?>></div>
-		<?php
-	}
-
 	public function field_group_admin_enqueue_scripts() {
+
 		Asset\Asset::get('css/admin/acf-wizard-settings.css')->enqueue();
 		Asset\Asset::get('js/admin/acf-wizard-settings.js')->enqueue();
 
@@ -150,4 +129,29 @@ class WizardStep extends AbstractWizardField {
 		Asset\Asset::get('js/admin/acf-wizard.js')->enqueue();
 
 	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	function load_field( $field ) {
+
+		// remove name to avoid caching issue
+		$field['name'] = '';
+
+		// remove instructions
+		$field['instructions'] = '';
+
+		// remove required to avoid JS issues
+		$field['required'] = 0;
+
+		// set value other than 'null' to avoid ACF loading / caching issue
+		$field['value'] = false;
+
+		// return
+		return $field;
+
+	}
+
+
 }

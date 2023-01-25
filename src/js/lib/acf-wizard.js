@@ -34,11 +34,11 @@ class Wizard {
 	/** @var Array */
 	steps = []
 
-	get current() {
+	get currentStep() {
 		let cur = false
 		this.parent
 			.querySelectorAll('.acf-field-wizard-step')
-			.forEach( el => idx = el.matches('.active') ? el : cur )
+			.forEach( el => cur = el.matches('.active') ? el : cur )
 		return cur
 	}
 
@@ -159,6 +159,7 @@ class Wizard {
 	 *	@return Wizard
 	 */
 	goto(fieldKey) {
+		let navKey
 		this.parent
 			.querySelector(`:scope > [data-key="${fieldKey}"]`)
 			.classList.add('active')
@@ -168,18 +169,26 @@ class Wizard {
 			.forEach( el => {
 				el.classList.remove('active')
 			})
-		const navItem = this.currentNavItem
-		if ( ! navItem ) {
-			return
-		}
-		const navKey = navItem.getAttribute('data-wizard-target')
 
-		navItem.classList.add('active')
-		this.stepper
-			.querySelectorAll(`[data-wizard-target]:not([data-wizard-target="${navKey}"])`)
-			.forEach( el => {
-				el.classList.remove('active')
-			})
+		const navItem = this.currentNavItem
+		const step = this.currentStep
+
+		if ( navItem ) {
+			navKey = navItem.getAttribute('data-wizard-target')
+
+			navItem.classList.add('active')
+			this.stepper
+				.querySelectorAll(`[data-wizard-target]:not([data-wizard-target="${navKey}"])`)
+				.forEach( el => {
+					el.classList.remove('active')
+				})
+		}
+
+		if ( step ) {
+			this.parent.setAttribute('data-show-stepper', step.getAttribute('data-show-stepper') )
+		}
+
+
 		return this
 	}
 
@@ -205,115 +214,3 @@ document.addEventListener('click', e => {
 })
 
 module.exports = Wizard
-//
-//
-//
-// const wizards = []
-//
-// const findWizardByField = field => {
-// 	let wizard = wizards.find( w => field.$el.parent().get(0) === w.parent.get(0) )
-// 	if ( undefined === wizard ) {
-// 		wizard = {
-// 			parent: field.$el.parent(),
-// 			fields: [],
-// 			$stepper: false,
-// 			$navItem: false
-// 		}
-// 		wizards.push(wizard)
-// 	}
-// 	return wizard
-// }
-//
-// const findWizardByElement = el => {
-// 	const parent = el.closest('[data-wizard-container="1"]')
-// 	return wizards.find( w => parent === w.parent.get(0) )
-// }
-//
-//
-// //
-// // const wizardManager = new acf.Model({
-// // 	addPage: function( field ) {
-// // 		const wizard = findWizardByField( field )
-// // 		const isInitial = ! wizard.$stepper
-// // 		let $stepper
-// //
-// // 		if ( isInitial ) {
-// // 			wizard.$stepper = $('<div class="acf-wizard-stepper" />')
-// // 			wizard.$stepper
-// // 				.insertBefore( field.$el )
-// // 			wizard.parent
-// // 				.attr( 'data-wizard-container', 1 )
-// // 		}
-// // 		const idx = wizard.parent.find('.acf-wizard').length
-// // 		// field.$el.attr('data-wizard-index',idx )
-// // 		wizard.$navItem = this.createNavItem( field, wizard.$stepper.find('.acf-wizard-nav-item').length + 1 )
-// //
-// // 		if ( wizard.$navItem ) {
-// // 			wizard.$stepper.append( wizard.$navItem )
-// // 		}
-// // 		wizard.fields.push( field )
-// //
-// // 		if ( isInitial ) {
-// // 			this.goto( field.get('key') )
-// // 		}
-// // 		if ( field.$el.is('.acf-field-wizard-step[data-conditions]:not([data-wizard-nav="none"])') ) {
-// // 			hiddenObserver.observe( field.$el.get(0), { attributes: true } )
-// // 		}
-// //
-// // 		return wizard
-// // 	},
-// // 	createNavItem: function( field, num ) {
-// // 		const navType = field.$el.attr('data-wizard-nav')
-// // 		const fieldKey = field.get('key')
-// // 		let name = ''
-// // 		let className = ''
-// // 		let disabled = ''
-// // 		let $btn;
-// // 		if ( 'none' === navType ) {
-// // 			return false
-// // 		}
-// // 		if ( navType.includes('name') ) {
-// // 			name = `<span class="acf-wizard-nav-item-name">${field.$el.find('.acf-label').text()}</span>`;
-// // 		}
-// // 		if ( navType.includes('number') ) {
-// // 			className = '-numbered';
-// // 		}
-// // 		$btn = $( `<button type="button" class="acf-wizard-nav-item ${className}" data-wizard-action="goto" data-wizard-target="${fieldKey}">${name}</button>`)
-// // 		if ( field.$el.is('.acf-hidden') ) {
-// // 			$btn.prop('disabled',true)
-// // 		}
-// // 		return $btn
-// // 	},
-// // 	goto: function( fieldKey ) {
-// // 		// $(`[data-key="${fieldKey}"]`)
-// // 		// 	.addClass('active')
-// // 		// 	.parent()
-// // 		// 	.find(`.acf-field-wizard-step:not([data-key="${fieldKey}"])`)
-// // 		// 	.removeClass('active')
-// // 		// $(`[data-wizard-target="${fieldKey}"]`)
-// // 		// 	.addClass('active')
-// // 		// 	.parent()
-// // 		// 	.find(`[data-wizard-target]:not([data-wizard-target="${fieldKey}"])`)
-// // 		// 	.removeClass('active')
-// // 	}
-// // })
-//
-// $(document)
-// 	.on('click','button[data-wizard-action="goto"]', e => {
-// 		e.preventDefault()
-// 		wizardManager.goto( $(e.currentTarget).attr('data-wizard-target') )
-// 	})
-// 	.on('click','button[data-wizard-action="forward"]', e => {
-// 		const steps = parseInt( $(e.currentTarget).attr('data-wizard-steps') )
-// 		e.preventDefault()
-// 		findWizardByElement(e.currentTarget).fields.indexOf()
-//
-// 	})
-// 	.on('click','button[data-wizard-action="back"]', e => {
-// 		const steps = parseInt( $(e.currentTarget).attr('data-wizard-steps') ) * -1
-// 		wizardManager.stepBy( $(e.currentTarget).attr('data-wizard-steps') * -1 )
-// 	})
-//
-//
-//
-// // module.exports = wizardManager;
