@@ -1,0 +1,35 @@
+# Copyright (C) 2023 mcguffin
+# This file is distributed under the GPL3.
+msgid ""
+msgstr ""
+"Project-Id-Version: ACF Wizard 0.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acf-wizard\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-01-25T21:51:10+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.7.1\n"
+"X-Domain: acf-wizard\n"
+
+#. Plugin Name of the plugin
+msgid "ACF Wizard"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "http://wordpress.org/"
+msgstr ""
+
+#. Description of the plugin
+msgid "Build a First-Run-Wizard in ACF."
+msgstr ""
+
+#. Author of the plugin
+msgid "mcguffin"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://github.com/mcguffin"
+msgstr ""

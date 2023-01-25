@@ -1,6 +1,6 @@
 {
   "name": "acf-wizard",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "private": true,
   "author": "mcguffin",
@@ -87,6 +87,7 @@
     ],
     "type": "plugin",
     "build": {
+      "versionedFiles": null,
       "prebuild": [
         "wp i18n make-pot . languages/acf-wizard.pot --domain=acf-wizard --exclude=tmp"
       ],
