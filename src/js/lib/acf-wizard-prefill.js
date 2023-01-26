@@ -148,7 +148,7 @@ class WizardPrefill {
 			'checkbox': () => select(true),
 			'radio': () => select(false),
 			'button_group': () => select(false),
-			'true_false': () => `<input type="hidden" value="0" name="${this.field.getInputName()}[prefill_values][${index}][val]" /><input type="checkbox" value="1" name="${this.field.getInputName()}[prefill_values][${index}][val]" />`,
+			'true_false': () => `<input type="hidden" value="0" name="${this.field.getInputName()}[prefill_values][${index}][val]" /><input type="checkbox" value="1" name="${this.field.getInputName()}[prefill_values][${index}][val]" ${parseInt(value)?'checked':''} />`,
 
 		}
 

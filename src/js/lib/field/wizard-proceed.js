@@ -44,15 +44,19 @@ const WizardProceed = acf.Field.extend({
 		const data = JSON.parse( this.$button().attr('data-wizard-prefill') )
 		Object.values(data).forEach( d => {
 			const field = acf.getFields( { key: d.field_key } )[0]
-
-			if ( 'checkbox' === field.get('type') ) {
+			const fieldType = field.get('type');
+			if ( 'checkbox' === fieldType ) {
 				field.$inputs().each((i,el) => {
 					el.checked = d.val.includes(el.value)
 				})
+			} else if ( 'radio' === fieldType ) {
+				field.$control().find(`[value="${d.val}"]`).prop('checked', d.val )
+			} else if ( 'true_false' === fieldType ) {
+				field.$input().prop('checked', parseInt(d.val) )
 			} else {
 				field.val( d.val )
 			}
-			console.log(field)
+			field.trigger('change')
 		})
 
 	},
