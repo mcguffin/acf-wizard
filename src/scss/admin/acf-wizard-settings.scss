@@ -10,9 +10,39 @@
 	}
 	td.value {
 		width:70%;
+		input[type="checkbox"] {
+			margin: 8px 5px;
+			&,
+			&::before {
+				width: 22px;
+				height: 22px;
+			}
+		}
+		input[type="email"] {
+			box-sizing: border-box;
+			height: 40px;
+			padding-right: 12px;
+			padding-left: 12px;
+			background-color: #fff;
+			border-color: #D0D5DD;
+			box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.1);
+			border-radius: 6px;
+			color: #344054;
+		}
 	}
 	td.remove {
 		vertical-align: middle;
+		a {
+			&.acf-icon {
+				width: 22px;
+				height: 22px;
+			}
+			&::before {
+				position: relative;
+				top: -2px;
+				font-size: 16px;
+			}
+		}
 	}
 	tr:nth-last-of-type(2) {
 		td.remove {
