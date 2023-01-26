@@ -24,6 +24,7 @@ class WizardProceed extends \acf_field {
 			'wizard_steps'   => 1, // # steps
 			'wizard_target'  => '', // wizard page field key
 			'style'          => 'primary', // primary | secondary | link
+			'size'           => '', // primary | secondary | link
 			'button_label'   => __( 'Continue', 'acf-wizard' ),
 			'enable_prefill' => 0,
 			'auto_disable'   => 1,
@@ -241,10 +242,35 @@ class WizardProceed extends \acf_field {
 				'name'         => 'style',
 				'ui'           => 0,
 				'multiple'     => 0,
+				'wrapper'      => [ 'width' => '50' ],
 				'choices'      => [
 					'primary'   => __('Primary Button', 'acf-wizard' ),
 					'secondary' => __('Secondary Button', 'acf-wizard' ),
 					'link'      => __('Link', 'acf-wizard' ),
+				],
+			]
+		);
+		acf_render_field_setting(
+			$field,
+			[
+				'label'        => __( 'Button Size', 'acf-wizard' ),
+				'instructions' => '',
+				'type'         => 'select',
+				'name'         => 'size',
+				'ui'           => 0,
+				'multiple'     => 0,
+				'wrapper'      => [ 'width' => '50' ],
+				'choices'      => [
+					'small'   => __( 'Small', 'acf-wizard' ),
+					''        => __( 'Normal', 'acf-wizard' ),
+					'hero'    => __( 'Large', 'acf-wizard' ),
+				],
+				'conditions'   => [
+					[
+						'field'    => 'style',
+						'operator' => '!=',
+						'value'    => 'link',
+					],
 				],
 			]
 		);
@@ -293,7 +319,11 @@ class WizardProceed extends \acf_field {
 
 		}
 
-		$atts['class'] = 'acf-wizard-btn button-'.$field['style'];
+		$atts['class'] = sprintf( 'acf-wizard-btn button button-%1$s', $field['style'] );
+
+		if ( $field['style'] !== 'link' && ! empty( $button['size'] ) ) {
+			$atts['class'] .= sprintf(' button-%s', $button['size'] );
+		}
 
 		?>
 		<button <?php echo acf_esc_attrs( $atts ); ?>>
