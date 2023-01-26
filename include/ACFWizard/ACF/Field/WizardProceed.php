@@ -26,6 +26,7 @@ class WizardProceed extends \acf_field {
 			'style'          => 'primary', // primary | secondary | link
 			'button_label'   => __( 'Continue', 'acf-wizard' ),
 			'enable_prefill' => 0,
+			'auto_disable'   => 1,
 			/**  @var array[] [ 'field_key' = 'field_...', 'value' => '...' ] */
 			'prefill_values' => [], // prefill current form. supports select, radio, checkbox, email, url, text, textarea, wysiwyg, color, date
 			'button_align'   => 'right',
@@ -131,6 +132,24 @@ class WizardProceed extends \acf_field {
 					'field'    => 'wizard_action',
 					'operator' => '==',
 					'value'    => 'goto',
+				],
+			]
+		);
+
+		acf_render_field_setting(
+			$field,
+			[
+				'label'        => __( 'Auto Disable','acf-wizard' ),
+				'instructions' => __( 'Disable button if target is not navigatable', 'acf-wizard' ),
+				'type'         => 'true_false',
+				'name'         => 'auto_disable',
+				'ui'           => 1,
+				'conditions'   => [
+					[
+						'field'    => 'wizard_action',
+						'operator' => '!=',
+						'value'    => 'submit',
+					],
 				],
 			]
 		);
@@ -259,6 +278,7 @@ class WizardProceed extends \acf_field {
 				'data-wizard-action'  => $field['wizard_action'],
 				'data-wizard-target'  => $field['wizard_target'],
 				'data-wizard-steps'   => $field['wizard_steps'],
+				'data-wizard-disable' => $field['auto_disable'],
 				'data-wizard-prefill' => $field['enable_prefill']
 					? $this->sanitize_prefill_values( $field['prefill_values'] )
 					: json_encode( false ),

@@ -15,10 +15,13 @@ const WizardProceed = acf.Field.extend({
 		}
 
 		this.wizard = Wizard.findByElement( this.$el.get(0) )
-		this.wizard.addEventListener( 'acf_wizard/navigated', e => {
 
-			this.onWizardNavigate(e)
-		} )
+		// auto disable
+		if ( parseInt( this.$el.getAttribute('data-wizard-disable') ) ) {
+			this.wizard.addEventListener( 'acf_wizard/navigated', e => {
+				this.onWizardNavigate(e)
+			} )
+		}
 
 		// collect, init, ...
 	},
