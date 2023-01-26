@@ -304,8 +304,8 @@ class WizardProceed extends \acf_field {
 				'class' => 'acf-table -clear acf-wizard-prefill-table',
 			];
 			$prefill_values = $this->sanitize_prefill_values( $field['prefill_values'] );
-			/* */
-			?><pre><?php var_dump($prefill_values);?></pre>
+			/* <pre><?php var_dump($prefill_values);?></pre> */
+			?>
 			<input type="hidden" name="<?php echo esc_attr( $field['prefix'] ); ?>[prefill_values]" value="0">
 			<table <?php echo acf_esc_attrs( $tblAttr ); ?>>
 				<tbody>
