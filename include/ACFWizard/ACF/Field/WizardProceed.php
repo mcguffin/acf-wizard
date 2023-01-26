@@ -181,6 +181,9 @@ class WizardProceed extends \acf_field {
 	 *	@return array
 	 */
 	private function get_wizard_step_choices( $field ) {
+
+		// get field parent until fieldgroup or group with steps
+
 		$fields = array_map(
 			function( $field ) {
 				return array_intersect_key( $field,
@@ -197,6 +200,10 @@ class WizardProceed extends \acf_field {
 				}
 			)
 		);
+/* ?><pre><?php var_dump($field);?></pre><?php */
+		if ( ! count( $fields ) && ! empty( $field['wizard_target'] ) ) {
+			return [ $field['wizard_target'] => 'PLACEHOLDER' ];
+		}
 		return array_combine(
 			array_map( function( $choice ) { return $choice['key']; }, $fields ),
 			array_map( function( $choice ) { return $choice['label']; }, $fields )
@@ -342,7 +349,9 @@ class WizardProceed extends \acf_field {
 							</td>
 							<td class="value">
 								<?php
+
 								$tpl = '<input type="hidden" name="%1$s[prefill_values][%2$d][value]%4$s" value="%3$s" />';
+
 								if ( is_array( $prefill_value['val'] ) ) {
 									array_map( function ( $val ) use ( $tpl, $field, $i ) {
 										printf(

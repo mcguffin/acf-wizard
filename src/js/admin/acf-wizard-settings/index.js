@@ -40,8 +40,11 @@ const renderSelects = () => {
 	// render navigation target selects
 	acf.getFieldObjects({type:'wizard_proceed'}).forEach( field => {
 
-		acf.renderSelect(field.$el.find('[data-name="wizard_target"] select'), getTargetChoices() );
+		// target_select
+		const $targetSelect = field.$el.find('[data-name="wizard_target"] select');
+		acf.renderSelect( $targetSelect, getTargetChoices() );
 
+		// prefill > field
 		const prefillChoices = getPrefillFieldChoices()
 
 		field.$el.find('tr.prefill td.field select').each( (i,el) => {
