@@ -17,7 +17,7 @@ const WizardProceed = acf.Field.extend({
 		this.wizard = Wizard.findByElement( this.$el.get(0) )
 
 		// auto disable
-		if ( parseInt( this.$el.getAttribute('data-wizard-disable') ) ) {
+		if ( parseInt( this.$button().attr('data-wizard-disable') ) ) {
 			this.wizard.addEventListener( 'acf_wizard/navigated', e => {
 				this.onWizardNavigate(e)
 			} )
