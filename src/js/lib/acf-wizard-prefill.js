@@ -13,10 +13,12 @@ class WizardPrefill {
 		return this.field.$el.get(0).querySelectorAll('tr.prefill:not(.acf-wizard-prefill-template)')
 	}
 
+	get table() {
+		return this.field.$el.get(0).querySelector('.acf-wizard-prefill-table')
+	}
+
 	constructor(field) {
 		this.field = field
-		this.table = this.field.$el.get(0).querySelector('.acf-wizard-prefill-table')
-
 	}
 
 	update() {
