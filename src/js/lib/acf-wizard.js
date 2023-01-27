@@ -31,12 +31,19 @@ class Wizard extends EventTarget {
 	/** @var DOMNode */
 	stepper
 
+	/** @var int */
+	stepCounter = 0
+
 	/** @var Array */
 	navigationElements = []
 
 	/** @return NodeList */
 	get steps() {
 		return this.parent.querySelectorAll(':scope > .acf-field-wizard-step');
+	}
+
+	get isReady() {
+		return this.stepCounter > 0 && this.steps.length === this.stepCounter
 	}
 
 	get currentStep() {
@@ -92,6 +99,7 @@ class Wizard extends EventTarget {
 		this.stepper.classList.add('acf-wizard-stepper')
 		this.parent.prepend( this.stepper )
 
+		// disable navigation elements for hidden groups
 		this.#observer = new MutationObserver( (mutations,observer) => {
 			mutations.forEach( mutation => {
 
@@ -100,7 +108,7 @@ class Wizard extends EventTarget {
 
 				// direct references
 				document
-					.querySelectorAll(`[data-wizard-action="goto"][data-wizard-target="${fieldKey}"]`)
+					.querySelectorAll(`[data-wizard-action="goto"][data-wizard-target="${fieldKey}"][data-wizard-disable="1"]`)
 					.forEach( el => {
 						el.disabled = isHidden
 					} )
@@ -124,6 +132,13 @@ class Wizard extends EventTarget {
 
 		const navType = el.getAttribute('data-wizard-nav')
 
+		this.stepCounter++
+
+		if ( this.isReady ) {
+			// todo: save in user prefs
+			this.currentIndex = 0
+		}
+
 		if ( 'none' === navType ) {
 			return false
 		}
@@ -135,6 +150,7 @@ class Wizard extends EventTarget {
 		btn.type = 'button'
 		btn.setAttribute('data-wizard-action','goto')
 		btn.setAttribute('data-wizard-target', fieldKey )
+		btn.setAttribute('data-wizard-disable', '1' )
 		if ( navType.includes('name') ) {
 			btn.innerHTML = `<span class="acf-wizard-nav-item-name">${el.querySelector('.acf-label').textContent}</span>`
 		}
@@ -146,10 +162,6 @@ class Wizard extends EventTarget {
 
 		if ( el.matches('.acf-field-wizard-step[data-conditions]:not([data-wizard-nav="none"])') ) {
 			this.#observer.observe( el, { attributes: true } )
-		}
-
-		if ( this.currentIndex < 0 ) {
-			this.goto(fieldKey)
 		}
 
 		return this
@@ -179,6 +191,8 @@ class Wizard extends EventTarget {
 				el.classList.remove('active')
 			})
 
+		this.updateIndex()
+
 		const navItem = this.currentNavItem
 		const step = this.currentStep
 
@@ -200,6 +214,10 @@ class Wizard extends EventTarget {
 		this.dispatchEvent( new Event('acf_wizard/navigated') )
 
 		return this
+	}
+
+	updateIndex() {
+		this.parent.setAttribute('data-wizard-current-index', this.currentIndex )
 	}
 
 	canNavigateSteps(steps) {

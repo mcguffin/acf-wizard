@@ -242,7 +242,7 @@ class WizardProceed extends \acf_field {
 				'name'         => 'style',
 				'ui'           => 0,
 				'multiple'     => 0,
-				'wrapper'      => [ 'width' => '50' ],
+				'wrapper'      => [ 'width' => '33' ],
 				'choices'      => [
 					'primary'   => __('Primary Button', 'acf-wizard' ),
 					'secondary' => __('Secondary Button', 'acf-wizard' ),
@@ -259,7 +259,7 @@ class WizardProceed extends \acf_field {
 				'name'         => 'size',
 				'ui'           => 0,
 				'multiple'     => 0,
-				'wrapper'      => [ 'width' => '50' ],
+				'wrapper'      => [ 'width' => '33' ],
 				'choices'      => [
 					'small'   => __( 'Small', 'acf-wizard' ),
 					''        => __( 'Normal', 'acf-wizard' ),
@@ -284,6 +284,7 @@ class WizardProceed extends \acf_field {
 				'name'         => 'button_align',
 				'ui'           => 0,
 				'multiple'     => 0,
+				'wrapper'      => [ 'width' => '34' ],
 				'choices'      => [
 					'left'   => __( 'Left', 'acf-wizard' ),
 					'center' => __( 'Center', 'acf-wizard' ),
@@ -319,10 +320,10 @@ class WizardProceed extends \acf_field {
 
 		}
 
-		$atts['class'] = sprintf( 'acf-wizard-btn button button-%1$s', $field['style'] );
+		$atts['class'] = sprintf( 'acf-wizard-btn button-%1$s', $field['style'] );
 
-		if ( $field['style'] !== 'link' && ! empty( $button['size'] ) ) {
-			$atts['class'] .= sprintf(' button-%s', $button['size'] );
+		if ( $field['style'] !== 'link' && ! empty( $field['size'] ) ) {
+			$atts['class'] .= sprintf(' button button-%s', $field['size'] );
 		}
 
 		?>
