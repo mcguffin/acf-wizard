@@ -1,4 +1,6 @@
 
+import { isElementInViewport } from 'viewport'
+
 class Wizard extends EventTarget {
 	/** @var Array */
 	static #instances = []
@@ -113,6 +115,7 @@ class Wizard extends EventTarget {
 						el.disabled = isHidden
 					} )
 			})
+			this.dispatchEvent( new Event('acf_wizard/navigated') )
 		})
 
 		Wizard.#instances[idx] = this
@@ -122,7 +125,12 @@ class Wizard extends EventTarget {
 		this.#observer.disconnect()
 	}
 
-
+	scrollToStepper() {
+		if ( isElementInViewport( this.stepper ) ) {
+			return;
+		}
+		this.stepper.scrollIntoView( { behavior: 'smooth' } )
+	}
 
 	/**
 	 *	@param el DOMNode
@@ -152,7 +160,8 @@ class Wizard extends EventTarget {
 		btn.setAttribute('data-wizard-target', fieldKey )
 		btn.setAttribute('data-wizard-disable', '1' )
 		if ( navType.includes('name') ) {
-			btn.innerHTML = `<span class="acf-wizard-nav-item-name">${el.querySelector('.acf-label').textContent}</span>`
+			btn.classList.add('-named')
+			btn.innerHTML = `<span class="acf-wizard-nav-item-name">${el.querySelector('.acf-label').innerHTML}</span>`
 		}
 		btn.classList.add('acf-wizard-nav-item')
 		if ( navType.includes('number') ) {
@@ -212,6 +221,8 @@ class Wizard extends EventTarget {
 		}
 
 		this.dispatchEvent( new Event('acf_wizard/navigated') )
+
+		this.scrollToStepper()
 
 		return this
 	}

@@ -41,6 +41,7 @@ const WizardProceed = acf.Field.extend({
 		} else if ( 'back' === action ) {
 			active = e.target.canNavigateSteps( steps * -1 )
 		}
+
 		this.$button().prop( 'disabled', ! active )
 	},
 	onClick: function(e) {
@@ -48,6 +49,7 @@ const WizardProceed = acf.Field.extend({
 		Object.values(data).forEach( d => {
 			const field = acf.getFields( { key: d.field_key } )[0]
 			const fieldType = field.get('type');
+
 			if ( 'checkbox' === fieldType ) {
 				field.$inputs().each((i,el) => {
 					el.checked = d.val.includes(el.value)
@@ -55,7 +57,11 @@ const WizardProceed = acf.Field.extend({
 			} else if ( 'radio' === fieldType ) {
 				field.$control().find(`[value="${d.val}"]`).prop('checked', d.val )
 			} else if ( 'true_false' === fieldType ) {
-				field.$input().prop('checked', parseInt(d.val) )
+				if ( parseInt( d.val ) ) {
+					field.switchOn()
+				} else {
+					field.switchOff()
+				}
 			} else {
 				field.val( d.val )
 			}

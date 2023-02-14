@@ -82,7 +82,7 @@ class WPDashboard extends Core\Singleton {
 		}
 
 		// process form
-		add_action( 'load-index.php', [ $this, 'process_form' ] );
+		add_action( 'admin_action_acf_wizard_save', [ $this, 'process_form' ] );
 
 	}
 
@@ -93,7 +93,8 @@ class WPDashboard extends Core\Singleton {
 
 		?>
 		<div class="postbox">
-			<form class="acf-form" method="post">
+			<form class="acf-form" method="post" action="<?php echo esc_url( admin_url('admin.php') ); ?>">
+				<input type="hidden" name="action" value="acf_wizard_save" />
 				<?php
 
 				/**
@@ -154,10 +155,13 @@ class WPDashboard extends Core\Singleton {
 	 */
 	public function process_form() {
 
-		if ( ! acf_verify_nonce( 'welcome_panel' ) || ! acf_validate_save_post() ) {
-			return;
-		}
+		check_admin_referer( 'welcome_panel', '_acf_nonce' );
+
+		acf_validate_save_post( true );
+
 		acf_save_post( $this->post_id );
+		wp_safe_redirect( admin_url() );
+		exit();
 	}
 	// validate_form
 

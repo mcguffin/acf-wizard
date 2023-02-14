@@ -163,13 +163,6 @@ class WizardProceed extends \acf_field {
 				'type'         => 'true_false',
 				'name'         => 'enable_prefill',
 				'ui'           => 1,
-				'conditions'   => [
-					[
-						'field'    => 'wizard_action',
-						'operator' => '!=',
-						'value'    => 'submit',
-					],
-				],
 			]
 		);
 
@@ -301,26 +294,19 @@ class WizardProceed extends \acf_field {
 	 */
 	public function render_field( $field ) {
 
-		if ( 'submit' === $field['wizard_action'] ) {
-			$atts = [
-				'type' => 'submit',
-			];
-
-		} else {
-			$atts = [
-				'type'                => 'button',
-				'data-wizard-action'  => $field['wizard_action'],
-				'data-wizard-target'  => $field['wizard_target'],
-				'data-wizard-steps'   => $field['wizard_steps'],
-				'data-wizard-disable' => $field['auto_disable'],
-				'data-wizard-prefill' => $field['enable_prefill']
-					? $this->sanitize_prefill_values( $field['prefill_values'] )
-					: json_encode( false ),
-			];
-
-		}
-
-		$atts['class'] = sprintf( 'acf-wizard-btn button-%1$s', $field['style'] );
+		$atts = [
+			'type'                => 'submit' === $field['wizard_action']
+				? 'submit'
+				: 'button',
+			'data-wizard-action'  => $field['wizard_action'],
+			'data-wizard-target'  => $field['wizard_target'],
+			'data-wizard-steps'   => $field['wizard_steps'],
+			'data-wizard-disable' => $field['auto_disable'],
+			'data-wizard-prefill' => $field['enable_prefill']
+				? $this->sanitize_prefill_values( $field['prefill_values'] )
+				: json_encode( false ),
+			'class'              => sprintf( 'acf-wizard-btn button-%1$s', $field['style'] ),
+		];
 
 		if ( $field['style'] !== 'link' && ! empty( $field['size'] ) ) {
 			$atts['class'] .= sprintf(' button button-%s', $field['size'] );
