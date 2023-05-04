@@ -19,3 +19,4 @@ wp-plugin-boilerplate.json export-ignore
 composer.* export-ignore
 phpcs*.xml export-ignore
 phpunit.* export-ignore
+.wp-release-info.json export-ignore

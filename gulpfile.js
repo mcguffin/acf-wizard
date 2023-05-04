@@ -52,10 +52,10 @@ function js_task(debug) {
 			.map( entry => {
 				let target = entry.replace(/(\.\/src\/js\/|\/index)/g,'');
 				return browserify({
-				        entries: [entry],
+						entries: [entry],
 						debug: debug,
 						paths:['./src/js/lib']
-				    })
+					})
 					.transform( babelify.configure({}) )
 					.transform( 'browserify-shim' )
 					.plugin('tinyify')
