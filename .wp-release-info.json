@@ -1,9 +1,9 @@
 {
   "id": "https://github.com/mcguffin/acf-wizard/raw/main/.wp-release-info.json",
   "slug": "acf-wizard",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "url": "http://wordpress.org/",
-  "package": "https://github.com/mcguffin/acf-wizard/releases/download/0.0.2/acf-wizard.zip",
+  "package": "https://github.com/mcguffin/acf-wizard/releases/download/0.1.0/acf-wizard.zip",
   "tested": "4.9",
   "requires_php": "5.3"
 }
