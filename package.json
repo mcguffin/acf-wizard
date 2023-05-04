@@ -82,8 +82,7 @@
     "steps": [
       "build",
       "git",
-      "github",
-      "pack"
+      "github"
     ],
     "type": "plugin",
     "build": {
