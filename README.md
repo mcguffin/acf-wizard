@@ -62,9 +62,11 @@ Fired after acf fields have been rendered
 Installation
 ------------
 
-### Production (using Github Updater)
- - Install [Andy Fragen's GitHub Updater](https://github.com/afragen/github-updater) first.
- - In WP Admin go to Settings / GitHub Updater / Install Plugin. Enter `mcguffin/acf-wizard` as a Plugin-URI.
+### Production (using Github Updater – recommended for Multisite)
+ - Head over to [releases](../../releases)
+ - Download 'acf-wizard.zip'
+ - Upload and activate it like any other WordPress plugin
+ - AutoUpdate will run as long as the plugin is active
 
 ### Development
  - cd into your plugin directory
