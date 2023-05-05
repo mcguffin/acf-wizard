@@ -62,7 +62,7 @@ Fired after acf fields have been rendered
 Installation
 ------------
 
-### Production (using Github Updater – recommended for Multisite)
+### Production
  - Head over to [releases](../../releases)
  - Download 'acf-wizard.zip'
  - Upload and activate it like any other WordPress plugin
