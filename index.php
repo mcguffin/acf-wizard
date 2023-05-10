@@ -4,7 +4,7 @@
 Plugin Name: ACF Wizard
 Plugin URI: http://wordpress.org/
 Description: Build a First-Run-Wizard in ACF.
-Author: mcguffin
+Author: Jörn Lund
 Version: 0.1.0
 Author URI: https://github.com/mcguffin
 License: GPL3
